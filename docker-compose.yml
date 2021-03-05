@@ -1,0 +1,35 @@
+---
+## /* vim: set tabstop=2 softtabstop=2 shiftwidth=2 expandtab smarttab autoindent: */
+
+version: '3.7'
+
+services:
+  adguard:
+    image: 'adguard/adguardhome'
+    restart: 'always'
+    volumes:
+    - 'config:/opt/adguardhome/conf'
+    - 'work:/opt/adguardhome/work'
+    network_mode: 'bridge'
+    hostname: 'adguard.$DOMAIN'
+    container_name: 'adguard'
+    ports:
+    - '$HOST:53:53/udp'
+    - '$HOST:53:53/tcp'
+    labels:
+    - 'traefik.enable=true'
+    - 'traefik.http.routers.adguard.rule=Host(`adguard.$DOMAIN`)'
+    - 'traefik.http.routers.adguard.entrypoints=web'
+    - 'traefik.http.routers.adguard.middlewares=ipwhitelist,http-to-https'
+    - 'traefik.http.routers.adguard.service=adguard'
+    - 'traefik.http.routers.adguard-secure.rule=Host(`adguard.$DOMAIN`)'
+    - 'traefik.http.routers.adguard-secure.entrypoints=websecure'
+    - 'traefik.http.routers.adguard-secure.middlewares=ipwhitelist'
+    - 'traefik.http.routers.adguard-secure.service=adguard'
+    - 'traefik.http.middlewares.ipwhitelist.ipwhitelist.sourcerange=$NETWORKS'
+    - 'traefik.http.services.adguard.loadbalancer.passhostheader=true'
+    - 'traefik.http.services.adguard.loadbalancer.server.port=3000'
+
+volumes:
+  config: {}
+  work: {}
