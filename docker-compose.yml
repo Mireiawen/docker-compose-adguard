@@ -15,7 +15,6 @@ services:
       source: 'work'
       target: '/opt/adguardhome/work'
     network_mode: 'bridge'
-    hostname: '$HOSTNAME.$DOMAIN'
     container_name: 'adguard'
     ports:
     - '$HOST:53:53/udp'
