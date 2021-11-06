@@ -6,7 +6,9 @@ version: '3.7'
 services:
   adguard:
     image: 'adguard/adguardhome'
-    restart: 'always'
+    restart: 'unless-stopped'
+    networks:
+    - 'traefik'
     volumes:
     - type: 'volume'
       source: 'config'
@@ -14,7 +16,6 @@ services:
     - type: 'volume'
       source: 'work'
       target: '/opt/adguardhome/work'
-    network_mode: 'bridge'
     container_name: 'adguard'
     ports:
     - '$HOST:53:53/udp'
@@ -23,16 +24,19 @@ services:
     - 'traefik.enable=true'
     - 'traefik.http.routers.adguard.rule=Host(`$HOSTNAME.$DOMAIN`)'
     - 'traefik.http.routers.adguard.entrypoints=web'
-    - 'traefik.http.routers.adguard.middlewares=adguard-whitelist,http-to-https'
+    - 'traefik.http.routers.adguard.middlewares=ipwhitelist@file,http-to-https@file'
     - 'traefik.http.routers.adguard.service=adguard'
     - 'traefik.http.routers.adguard-secure.rule=Host(`$HOSTNAME.$DOMAIN`)'
     - 'traefik.http.routers.adguard-secure.entrypoints=websecure'
-    - 'traefik.http.routers.adguard-secure.middlewares=adguard-whitelist'
+    - 'traefik.http.routers.adguard-secure.middlewares=ipwhitelist@file'
     - 'traefik.http.routers.adguard-secure.service=adguard'
-    - 'traefik.http.middlewares.adguard-whitelist.ipwhitelist.sourcerange=$NETWORKS'
     - 'traefik.http.services.adguard.loadbalancer.passhostheader=true'
     - 'traefik.http.services.adguard.loadbalancer.server.port=3000'
 
 volumes:
   config: {}
   work: {}
+
+networks:
+  traefik:
+    external: true
