@@ -23,13 +23,9 @@ services:
     labels:
     - 'traefik.enable=true'
     - 'traefik.http.routers.adguard.rule=Host(`$HOSTNAME.$DOMAIN`)'
-    - 'traefik.http.routers.adguard.entrypoints=web'
-    - 'traefik.http.routers.adguard.middlewares=ipwhitelist@file,http-to-https@file'
+    - 'traefik.http.routers.adguard.entrypoints=websecure'
+    - 'traefik.http.routers.adguard.middlewares=$MIDDLEWARE'
     - 'traefik.http.routers.adguard.service=adguard'
-    - 'traefik.http.routers.adguard-secure.rule=Host(`$HOSTNAME.$DOMAIN`)'
-    - 'traefik.http.routers.adguard-secure.entrypoints=websecure'
-    - 'traefik.http.routers.adguard-secure.middlewares=ipwhitelist@file'
-    - 'traefik.http.routers.adguard-secure.service=adguard'
     - 'traefik.http.services.adguard.loadbalancer.passhostheader=true'
     - 'traefik.http.services.adguard.loadbalancer.server.port=3000'
 
