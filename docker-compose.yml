@@ -9,6 +9,9 @@ services:
     restart: 'unless-stopped'
     networks:
     - 'traefik'
+    ports:
+    - '$HOST:53:53/udp'
+    - '$HOST:53:53/tcp'
     volumes:
     - type: 'volume'
       source: 'config'
@@ -16,12 +19,9 @@ services:
     - type: 'volume'
       source: 'work'
       target: '/opt/adguardhome/work'
-    container_name: 'adguard'
-    ports:
-    - '$HOST:53:53/udp'
-    - '$HOST:53:53/tcp'
     labels:
     - 'traefik.enable=true'
+    - 'traefik.docker.network=traefik'
     - 'traefik.http.routers.adguard.rule=Host(`$HOSTNAME.$DOMAIN`)'
     - 'traefik.http.routers.adguard.entrypoints=websecure'
     - 'traefik.http.routers.adguard.middlewares=$MIDDLEWARE'
@@ -29,10 +29,10 @@ services:
     - 'traefik.http.services.adguard.loadbalancer.passhostheader=true'
     - 'traefik.http.services.adguard.loadbalancer.server.port=3000'
 
-volumes:
-  config: {}
-  work: {}
-
 networks:
   traefik:
     external: true
+
+volumes:
+  config: {}
+  work: {}
